@@ -2,9 +2,12 @@ package com.auth0.jwt.algorithms;
 
 import com.auth0.jwt.exceptions.SignatureGenerationException;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
+import com.auth0.jwt.interfaces.BCECDSAKeyProvider;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.ECDSAKeyProvider;
 import com.auth0.jwt.interfaces.RSAKeyProvider;
+import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey;
+import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey;
 
 import java.io.ByteArrayOutputStream;
 import java.security.interfaces.*;
@@ -219,6 +222,14 @@ public abstract class Algorithm {
      */
     public static Algorithm ECDSA256(ECPublicKey publicKey, ECPrivateKey privateKey) throws IllegalArgumentException {
         return ECDSA256(ECDSAAlgorithm.providerForKeys(publicKey, privateKey));
+    }
+
+    public static Algorithm SM2DSA(BCECPublicKey publicKey, BCECPrivateKey privateKey) throws IllegalArgumentException {
+        return SM2DSA(SM2Algorithm.providerForKeys(publicKey, privateKey));
+    }
+
+    public static Algorithm SM2DSA(BCECDSAKeyProvider keyProvider) throws IllegalArgumentException {
+        return new SM2Algorithm("SM2", "SM3WithSM2", keyProvider);
     }
 
     /**

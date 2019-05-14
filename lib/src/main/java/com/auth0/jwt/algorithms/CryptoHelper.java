@@ -103,6 +103,19 @@ class CryptoHelper {
         return s.verify(signatureBytes);
     }
 
+    boolean verifySignatureFor(String algorithm, PublicKey publicKey, String header, String payload, byte[] signatureBytes, String provider) throws NoSuchProviderException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+        return verifySignatureFor(algorithm, publicKey, header.getBytes(StandardCharsets.UTF_8), payload.getBytes(StandardCharsets.UTF_8), signatureBytes, provider);
+    }
+
+    boolean verifySignatureFor(String algorithm, PublicKey publicKey, byte[] headerBytes, byte[] payloadBytes, byte[] signatureBytes, String provider) throws NoSuchProviderException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+        final Signature s = Signature.getInstance(algorithm, provider);
+        s.initVerify(publicKey);
+        s.update(headerBytes);
+        s.update(JWT_PART_SEPARATOR);
+        s.update(payloadBytes);
+        return s.verify(signatureBytes);
+    }
+
     /**
      * Create signature for JWT header and payload using a private key.
      *
@@ -122,6 +135,23 @@ class CryptoHelper {
         s.update(headerBytes);
         s.update(JWT_PART_SEPARATOR);
         s.update(payloadBytes);
+        return s.sign();
+    }
+
+    byte[] createSignatureFor(String algorithm, PrivateKey privateKey, byte[] headerBytes, byte[] payloadBytes, String provider) throws NoSuchProviderException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+        final Signature s = Signature.getInstance(algorithm, provider);
+        s.initSign(privateKey);
+        s.update(headerBytes);
+        s.update(JWT_PART_SEPARATOR);
+        s.update(payloadBytes);
+        return s.sign();
+    }
+
+    @Deprecated
+    byte[] createSignatureFor(String algorithm, PrivateKey privateKey, byte[] contentBytes, String provider) throws NoSuchProviderException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+        final Signature s = Signature.getInstance(algorithm, provider);
+        s.initSign(privateKey);
+        s.update(contentBytes);
         return s.sign();
     }
 
